@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SBATCH="sbatch --parsable"
-SBATCH_TEST="$SBATCH --account=project_2001659 --partition=test -t 5"
+SBATCH_TEST="$SBATCH --account=$ACCOUNT --partition=test -t 5"
 
 if [[ $HOSTNAME == *mahti.csc.fi ]]; then
     CLUSTER="mahti"
@@ -21,7 +21,7 @@ elif [[ $HOSTNAME == uan* ]]; then
     GPUMEDIUM="small-g"
     FULLNODE="8"
     TWONODES="16"
-    SBATCH_TEST="$SBATCH --account=project_462000007 --partition=debug -t 5"
+    SBATCH_TEST="$SBATCH --account=$ACCOUNT --partition=debug -t 5"
 else
     echo "ERROR: cannot determine cluster from hostname: $HOSTNAME"
     exit 1
@@ -29,7 +29,7 @@ fi
 
 echo "Detected $CLUSTER cluster"
 
-if [ "$LMOD_FAMILY_PYTHON_ML_ENV" != "pytorch" ]
+if [ "$LMOD_FAMILY_PYTHON_ML_ENV" != "pytorch" ] && [ -z $SIF ]
 then
     echo "WARNING: no pytorch module loaded, loading default module"
     if [ "$CLUSTER" = "lumi" ]; then
