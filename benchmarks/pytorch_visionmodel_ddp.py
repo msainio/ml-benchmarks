@@ -5,7 +5,6 @@ import multiprocessing
 from datetime import datetime
 import argparse
 import os
-import psutil
 
 import torch
 import torch.distributed as dist
@@ -36,7 +35,7 @@ def set_cpu_affinity(rank, local_rank):
     }
     cpu_list = LUMI_GPU_CPU_map[local_rank]
     print(f"Rank {rank} (local {local_rank}) binding to cpus: {cpu_list}")
-    psutil.Process().cpu_affinity(cpu_list)
+    os.sched_setaffinity(os.getpid(), cpu_list)
     
 
 class SyntheticData(torch.utils.data.Dataset):
