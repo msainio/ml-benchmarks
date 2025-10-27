@@ -23,7 +23,7 @@ if [ "$1" == "--data" ]; then
 
     if [ -z "$LOCAL_SCRATCH" ]; then
         LOCAL_SCRATCH=/tmp
-        #LOCAL_SCRATCH=/flash/project_462000007/mvsjober/tmp
+        #LOCAL_SCRATCH=/flash/$SLURM_JOB_ACCOUNT/$USER/tmp
     fi
     
     (set -x

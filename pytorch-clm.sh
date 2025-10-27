@@ -6,16 +6,10 @@ SCRIPT="benchmarks/run_clm.py"
 # Puhti and Mahti
 HF_MODEL=EleutherAI/gpt-neo-125M
 # HF_MODEL=EleutherAI/gpt-neo-1.3B
-export HF_HOME=/scratch/project_2001659/mvsjober/hf-home
-export TORCH_HOME=/scratch/project_2001659/mvsjober/torch-cache
+export HF_HOME=/scratch/$SLURM_JOB_ACCOUNT/$USER/hf-home
+export TORCH_HOME=/scratch/$SLURM_JOB_ACCOUNT/$USER/torch-cache
 
 export TOKENIZERS_PARALLELISM=false
-
-# LUMI
-if [ ! -d "/scratch/project_2001659/mvsjober" ]; then
-    HF_HOME=/scratch/project_462000007/mvsjober/hf-home
-    TORCH_HOME=/scratch/project_462000007/mvsjober/torch-cache
-fi
 
 if [ "$SLURM_NTASKS" -ne "$SLURM_NNODES" ]; then
     echo "ERROR: this script needs to be run as one task per node."
@@ -24,7 +18,7 @@ if [ "$SLURM_NTASKS" -ne "$SLURM_NNODES" ]; then
 fi
 
 if [ -z "$LOCAL_SCRATCH" ]; then
-    OUTPUT_DIR="/flash/project_462000007/mvsjober/run-clm/$SLURM_JOB_ID"
+    OUTPUT_DIR="/flash/$SLURM_JOB_ACCOUNT/$USER/run-clm/$SLURM_JOB_ID"
 else
     OUTPUT_DIR="$LOCAL_SCRATCH/run-clm/$SLURM_JOB_ID"
 fi

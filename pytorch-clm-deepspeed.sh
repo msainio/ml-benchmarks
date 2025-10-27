@@ -2,11 +2,11 @@ export OMP_NUM_THREADS=1
 export NCCL_DEBUG=INFO
 
 SCRIPT="benchmarks/run_clm.py"
-OUTPUT_DIR=/flash/project_462000007/mvsjober/run-clm
+OUTPUT_DIR=/flash/$SLURM_JOB_ACCOUNT/$USER/run-clm
 DS_CONFIG=benchmarks/ds_config_clm.json
 
-export HF_HOME=/scratch/project_462000007/mvsjober/hf-home
-export TORCH_HOME=/scratch/project_462000007/mvsjober/torch-cache
+export HF_HOME=/scratch/$SLURM_JOB_ACCOUNT/$USER/hf-home
+export TORCH_HOME=/scratch/$SLURM_JOB_ACCOUNT/$USER/torch-cache
 
 if [ "$SLURM_NTASKS" -ne "$SLURM_NNODES" ]; then
     echo "ERROR: this script needs to be run as one task per node."
