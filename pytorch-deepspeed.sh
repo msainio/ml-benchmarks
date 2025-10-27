@@ -1,13 +1,24 @@
 export OMP_NUM_THREADS=1
 export NCCL_DEBUG=INFO
 
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
+env | grep NCCL
+env | grep MIOPEN
+
 SCRIPT="benchmarks/pytorch_visionmodel_deepspeed.py"
 IMAGENET_DATA=/scratch/dac/data/ilsvrc2012-torch-resized-new.tar
 
 if which deepspeed > /dev/null 2>&1 ; then
     DEEPSPEED_BIN=deepspeed
 else
-    DEEPSPEED_BIN="singularity_wrapper exec deepspeed"
+    DEEPSPEED_BIN="$PYTHON3 -m deepspeed.launcher.runner"
 fi
 
 SCRIPT_OPTS="--deepspeed --deepspeed_config benchmarks/ds_config_benchmark.json"
@@ -29,7 +40,7 @@ if [ "$SLURM_NNODES" -gt 1 ]; then
     fi
     
     (set -x
-     srun python3 $SCRIPT $SCRIPT_OPTS $*
+     srun $PYTHON3 $SCRIPT $SCRIPT_OPTS $*
     )
 else
     if [ $SLURM_NTASKS -ne 1 ]; then

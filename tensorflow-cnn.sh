@@ -1,3 +1,11 @@
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
 SCRIPT="benchmarks/tensorflow-benchmarks/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py"
 ARGS="--model inception3 --num_warmup_batches 10 --use_fp16=true"
 
@@ -19,5 +27,5 @@ else
 fi
 
 (set -x
-srun python3 $SCRIPT $ARGS $*
+srun $PYTHON3 $SCRIPT $ARGS $*
 )

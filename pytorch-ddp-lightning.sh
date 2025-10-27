@@ -1,6 +1,17 @@
 export OMP_NUM_THREADS=1
 export NCCL_DEBUG=INFO
 
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
+env | grep NCCL
+env | grep MIOPEN
+
 SCRIPT="benchmarks/pytorch_visionmodel_lightning.py"
 IMAGENET_DATA=/scratch/dac/data/ilsvrc2012-torch-resized-new.tar
 
@@ -22,7 +33,7 @@ if [ "$1" == "--data" ]; then
 fi
 
 (set -x
- srun python3 $SCRIPT --gpus=$NUM_GPUS --nodes=$SLURM_NNODES $SCRIPT_OPTS $*
+ srun $PYTHON3 $SCRIPT --gpus=$NUM_GPUS --nodes=$SLURM_NNODES $SCRIPT_OPTS $*
 )
 
 

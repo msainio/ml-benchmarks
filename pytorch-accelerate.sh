@@ -1,6 +1,17 @@
 export OMP_NUM_THREADS=1
 export NCCL_DEBUG=INFO
 
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
+env | grep NCCL
+env | grep MIOPEN
+
 SCRIPT="benchmarks/pytorch_visionmodel_accelerate.py"
 IMAGENET_DATA=/scratch/dac/data/ilsvrc2012-torch-resized-new.tar
 
@@ -49,7 +60,7 @@ export ACCELERATE_CPU_AFFINITY=1
 
 # Note: --machine_rank must be evaluated on each node, hence the LAUNCH_CMD setup
 export LAUNCH_CMD="
-       accelerate launch \
+       srun $PYTHON3 -m accelerate.commands.accelerate_cli \
               --multi_gpu \
               --num_processes=$NUM_PROCESSES \
               --num_machines=$SLURM_NNODES \

@@ -1,3 +1,11 @@
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
 ARGS="--batch-size=64 --num-iters=100"
 
 if [ "$SLURM_NTASKS" -eq 1 ]; then
@@ -17,5 +25,5 @@ fi
 
 echo "SING_IMAGE=$SING_IMAGE"
 (set -x
-srun python3 $SCRIPT $ARGS $*
+srun $PYTHON3 $SCRIPT $ARGS $*
 )

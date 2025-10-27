@@ -1,9 +1,19 @@
 export OMP_NUM_THREADS=1
 export NCCL_DEBUG=INFO
 
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
+env | grep NCCL
+env | grep MIOPEN
+
 SCRIPT="benchmarks/run_clm.py"
 
-# Puhti and Mahti
 HF_MODEL=EleutherAI/gpt-neo-125M
 # HF_MODEL=EleutherAI/gpt-neo-1.3B
 export HF_HOME=/scratch/$SLURM_JOB_ACCOUNT/$USER/hf-home
@@ -38,7 +48,7 @@ if [ "$SLURM_NNODES" -gt 1 ]; then
 fi
 
 (set -x
- srun python3 -m torch.distributed.run $DIST_OPTS \
+ srun $PYTHON3 -m torch.distributed.run $DIST_OPTS \
       --nnodes=$SLURM_NNODES --nproc_per_node=$NUM_GPUS $SCRIPT \
       --model_name_or_path $HF_MODEL \
       --dataset_name wikitext --dataset_config_name wikitext-2-raw-v1 \

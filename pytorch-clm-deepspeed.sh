@@ -1,6 +1,17 @@
 export OMP_NUM_THREADS=1
 export NCCL_DEBUG=INFO
 
+PYTHON3="python3"
+
+if [ -n "$SIF" ]; then
+    PYTHON3="singularity exec $SIF python3"
+fi
+
+echo "PYTHON3=$PYTHON3"
+
+env | grep NCCL
+env | grep MIOPEN
+
 SCRIPT="benchmarks/run_clm.py"
 OUTPUT_DIR=/flash/$SLURM_JOB_ACCOUNT/$USER/run-clm
 DS_CONFIG=benchmarks/ds_config_clm.json
@@ -20,7 +31,7 @@ if [ "$SLURM_NNODES" -gt 1 ]; then
      RDZV_PORT=29400
 
      (set -x
-      srun python3 -m torch.distributed.run --rdzv_id=$SLURM_JOB_ID --rdzv_backend=c10d --rdzv_endpoint=$RDZV_HOST:$RDZV_PORT \
+      srun $PYTHON3 -m torch.distributed.run --rdzv_id=$SLURM_JOB_ID --rdzv_backend=c10d --rdzv_endpoint=$RDZV_HOST:$RDZV_PORT \
            --nnodes=$SLURM_NNODES --nproc_per_node=$NUM_GPUS $SCRIPT \
            --deepspeed $DS_CONFIG \
            --model_name_or_path EleutherAI/gpt-neo-1.3B \
@@ -35,7 +46,7 @@ else
     fi
 
     (set -x
-     srun singularity_wrapper exec deepspeed --num_gpus=$NUM_GPUS $SCRIPT --deepspeed $DS_CONFIG \
+     srun $PYTHON3 -m deepspeed.launcher.runner --num_gpus=$NUM_GPUS $SCRIPT --deepspeed $DS_CONFIG \
           --model_name_or_path EleutherAI/gpt-neo-1.3B \
           --dataset_name wikitext --dataset_config_name wikitext-2-raw-v1 \
           --per_device_train_batch_size 2 --do_train \
